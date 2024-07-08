@@ -1,43 +1,42 @@
-import { useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 import { TaskCard } from "./TaskCard";
 import useGetTask from "../hooks/useGetTask";
 import { getCurrentDate } from "@/utils/getCurrentDate";
+import useGetCompleteTask from "../hooks/useGetCompleteTask";
 
 export const TaskList = () => {
   const { tasks } = useGetTask();
+  const { completeTasks } = useGetCompleteTask();
 
   const [todayTasks, setTodayTasks] = useState([]);
   const [upcomingTasks, setUpcomingTasks] = useState([]);
   const [dueTasks, setDueTasks] = useState([]);
 
-  useMemo(() => {
+  useEffect(() => {
     const today = getCurrentDate();
-    const upcoming = tasks.filter((task) => {
-      task.dueDate > today;
-    });
-    const due = tasks.filter((task) => {
-      task.dueDate < today;
-    });
 
-    console.log("Today Tasks:", todayTasks);
-    console.log("Upcoming Tasks:", upcomingTasks);
-    console.log("Due Tasks:", dueTasks);
+    const todayTasks = tasks.filter((task) => task.dueDate === today);
+    const upcomingTasks = tasks.filter((task) => task.dueDate > today);
+    const dueTasks = tasks.filter((task) => task.dueDate < today);
 
-    setTodayTasks(tasks.filter((task) => task.dueDate === today));
-    setUpcomingTasks(upcoming);
-    setDueTasks(due);
+    setTodayTasks(todayTasks);
+    setUpcomingTasks(upcomingTasks);
+    setDueTasks(dueTasks);
   }, [tasks]);
 
   const renderNoTasks = () => {
     if (
       todayTasks.length === 0 &&
       upcomingTasks.length === 0 &&
-      dueTasks.length === 0
+      dueTasks.length === 0 &&
+      completeTasks.length === 0
     ) {
       return (
-        <div className="text-center">
-          <p>No tasks yet</p>
+        <div className="absolute flex flex-col items-center -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
+          <p className="text-lg text-center font-light">
+            No worries, you don't have any tasks.
+          </p>
         </div>
       );
     }
@@ -48,13 +47,13 @@ export const TaskList = () => {
       {todayTasks.length > 0 && (
         <TaskCard taskType="Today" taskData={todayTasks} />
       )}
-
       {upcomingTasks.length > 0 && (
         <TaskCard taskType="Upcoming" taskData={upcomingTasks} />
       )}
-
       {dueTasks.length > 0 && <TaskCard taskType="Due" taskData={dueTasks} />}
-
+      {completeTasks.length > 0 && (
+        <TaskCard taskType="Complete" taskData={completeTasks} />
+      )}
       {renderNoTasks()}
     </section>
   );

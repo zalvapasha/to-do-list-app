@@ -85,7 +85,7 @@ export function AddTaskModal({ toggleModal }) {
   };
 
   return (
-    <div className="inset-0 fixed flex items-center justify-center">
+    <div className="inset-0 fixed flex items-center justify-center backdrop-blur-sm">
       <Card className="w-[350px]">
         <form onSubmit={handleSubmit}>
           <CardHeader>
